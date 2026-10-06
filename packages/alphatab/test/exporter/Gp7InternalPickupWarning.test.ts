@@ -3,6 +3,7 @@ import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { ConsoleLogger, Logger } from '@coderline/alphatab/Logger';
 import { describe, expect, it } from 'vitest';
 
+/** @internal */
 class WarningLogger extends ConsoleLogger {
     public warnings: string[] = [];
     public override warning(_category: string, message: string, ..._details: unknown[]): void {
