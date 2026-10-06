@@ -5,6 +5,7 @@ import { TremoloPickingEffect } from '@coderline/alphatab/model/TremoloPickingEf
 import { TremoloPickingStyle } from '@coderline/alphatab/model/TremoloPickingEffect';
 import { describe, expect, it } from 'vitest';
 
+/** @internal */
 class WarningLogger extends ConsoleLogger {
     public warnings: string[] = [];
     public override warning(_category: string, message: string, ..._details: unknown[]): void {
