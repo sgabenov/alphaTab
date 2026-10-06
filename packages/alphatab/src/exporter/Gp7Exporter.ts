@@ -1,6 +1,7 @@
 import { AlphaTabError, AlphaTabErrorType } from '@coderline/alphatab/AlphaTabError';
 import { Gp7ScoreViews } from '@coderline/alphatab/exporter/Gp7ScoreViews';
 import { Gp7TextLayout } from '@coderline/alphatab/exporter/Gp7TextLayout';
+import { Gp7PlaybackCompatibility } from '@coderline/alphatab/exporter/Gp7PlaybackCompatibility';
 import { Logger } from '@coderline/alphatab/Logger';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import type { Score } from '@coderline/alphatab/model/Score';
@@ -33,6 +34,7 @@ export class Gp7Exporter extends ScoreExporter {
         if (this.settings.exporter.gpAlignTextBottom) {
             Gp7TextLayout.apply(score, this.settings.exporter.gpTextLineLength);
         }
+        Gp7PlaybackCompatibility.warn(score);
 
         Logger.debug(this.name, 'Writing data entries');
         const gpifWriter: GpifWriter = new GpifWriter();
