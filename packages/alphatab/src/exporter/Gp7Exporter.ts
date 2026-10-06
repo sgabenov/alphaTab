@@ -1,3 +1,4 @@
+import { Gp7TextLayout } from '@coderline/alphatab/exporter/Gp7TextLayout';
 import { Logger } from '@coderline/alphatab/Logger';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import type { Score } from '@coderline/alphatab/model/Score';
@@ -23,6 +24,9 @@ export class Gp7Exporter extends ScoreExporter {
         // GP7+ requires string and fret information for all notes which we might need to assign
         // during export. We work on a copy to keep the input score untouched.
         score = Gp7Exporter._cloneScore(score, this.settings);
+        if (this.settings.exporter.gpAlignTextBottom) {
+            Gp7TextLayout.apply(score, this.settings.exporter.gpTextLineLength);
+        }
 
         Logger.debug(this.name, 'Writing data entries');
         const gpifWriter: GpifWriter = new GpifWriter();
