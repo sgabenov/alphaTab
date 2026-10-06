@@ -23,6 +23,8 @@ export class ExporterSettingsSerializer {
         o.set("indent", obj.indent);
         o.set("comments", obj.comments);
         o.set("gpsystemwidth", obj.gpSystemWidth);
+        o.set("gpaligntextbottom", obj.gpAlignTextBottom);
+        o.set("gptextlinelength", obj.gpTextLineLength);
         return o;
     }
     public static setProperty(obj: ExporterSettings, property: string, v: unknown): boolean {
@@ -35,6 +37,12 @@ export class ExporterSettingsSerializer {
                 return true;
             case "gpsystemwidth":
                 obj.gpSystemWidth = v! as number;
+                return true;
+            case "gpaligntextbottom":
+                obj.gpAlignTextBottom = v! as boolean;
+                return true;
+            case "gptextlinelength":
+                obj.gpTextLineLength = v! as number;
                 return true;
         }
         return false;
