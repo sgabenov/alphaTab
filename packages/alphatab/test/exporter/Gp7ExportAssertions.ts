@@ -6,6 +6,7 @@ import { XmlDocument } from '@coderline/alphatab/xml/XmlDocument';
 import { ZipReader } from '@coderline/alphatab/zip/ZipReader';
 import { expect } from 'vitest';
 
+/** @internal */
 export class Gp7ExportAssertions {
     public static writtenPitches(score: Score, bytes: Uint8Array): void {
         const settings = new Settings();
