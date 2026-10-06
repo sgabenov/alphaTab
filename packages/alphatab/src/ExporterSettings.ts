@@ -21,5 +21,16 @@ export class ExporterSettings {
      * @category Exporter
      */
     public comments: boolean = false;
-}
 
+    /**
+     * Optional physical width in millimeters for each system in a GP7/8 export.
+     * A positive value writes native GP8 score-view records, dividing this width
+     * equally among the bars of each requested system, including the last one.
+     * Choose the usable width for the target page and stylesheet. Zero leaves
+     * native automatic sizing unchanged. System bar counts must be positive integers.
+     * @since 1.9.0
+     * @defaultValue `0`
+     * @category Exporter
+     */
+    public gpSystemWidth: number = 0;
+}

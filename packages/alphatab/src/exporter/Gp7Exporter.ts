@@ -1,3 +1,5 @@
+import { AlphaTabError, AlphaTabErrorType } from '@coderline/alphatab/AlphaTabError';
+import { Gp7ScoreViews } from '@coderline/alphatab/exporter/Gp7ScoreViews';
 import { Logger } from '@coderline/alphatab/Logger';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import type { Score } from '@coderline/alphatab/model/Score';
@@ -20,12 +22,18 @@ export class Gp7Exporter extends ScoreExporter {
     }
 
     public writeScore(score: Score): void {
+        const systemWidth = this.settings.exporter.gpSystemWidth;
+        if (systemWidth !== 0 && (!Number.isFinite(systemWidth) || systemWidth <= 0)) {
+            throw new AlphaTabError(AlphaTabErrorType.General, 'gpSystemWidth must be zero or a finite positive width in millimeters.');
+        }
         // GP7+ requires string and fret information for all notes which we might need to assign
         // during export. We work on a copy to keep the input score untouched.
         score = Gp7Exporter._cloneScore(score, this.settings);
 
         Logger.debug(this.name, 'Writing data entries');
         const gpifWriter: GpifWriter = new GpifWriter();
+        gpifWriter.writeScoreViews = systemWidth > 0;
+        const views = systemWidth > 0 ? Gp7ScoreViews.write(score, systemWidth) : [];
         const gpifXml = gpifWriter.writeXml(score);
         const binaryStylesheet = BinaryStylesheet.writeForScore(score);
         const partConfiguration = PartConfiguration.writeForScore(score);
@@ -44,6 +52,7 @@ export class Gp7Exporter extends ScoreExporter {
             fileSystem.writeEntry(new ZipEntry(gpifWriter.backingTrackAssetFileName!, score.backingTrack!.rawAudioFile!));
         }
 
+        for (const view of views) fileSystem.writeEntry(view);
         fileSystem.end();
     }
 

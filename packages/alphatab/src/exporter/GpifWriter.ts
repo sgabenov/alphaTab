@@ -68,6 +68,8 @@ export class GpifWriter {
     private _rhythmIdLookup: Map<string, string> = new Map<string, string>();
     private _tuningByStaff: Map<Staff, number[]> = new Map<Staff, number[]>();
 
+    public writeScoreViews: boolean = false;
+
     public writeXml(score: Score): string {
         const xmlDocument = new XmlDocument();
 
@@ -152,6 +154,12 @@ export class GpifWriter {
                     }
                 }
                 staff.stringTuning.tunings = savedTunings;
+            }
+        }
+        if (this.writeScoreViews) {
+            const views = gpif.addElement('ScoreViews');
+            for (let i = 1; i <= score.tracks.length + 1; i++) {
+                views.addElement('ScoreView').attributes.set('id', i.toString());
             }
         }
     }
