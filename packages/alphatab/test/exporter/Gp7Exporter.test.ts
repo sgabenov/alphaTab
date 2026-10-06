@@ -11,7 +11,9 @@ import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
 import { IOHelper } from '@coderline/alphatab/io/IOHelper';
 import { TechniqueSymbolPlacement } from '@coderline/alphatab/model/InstrumentArticulation';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
 import type { Score } from '@coderline/alphatab/model/Score';
 import { Settings } from '@coderline/alphatab/Settings';
 import { XmlDocument } from '@coderline/alphatab/xml/XmlDocument';
@@ -56,6 +58,37 @@ describe('Gp7ExporterTest', () => {
         const fileName = name.substr(name.lastIndexOf('/') + 1);
         const exported = exportGp7(expected);
         const actual = prepareImporterWithBytes(exported).readScore();
+
+        // GPIF infers forced accidental modes from its absolute spelling.
+        // Legacy files can request a forced natural on a chromatic tab pitch;
+        // that impossible spelling is canonicalized without changing pitch.
+        const forcedModes = [
+            NoteAccidentalMode.ForceDoubleFlat,
+            NoteAccidentalMode.ForceFlat,
+            NoteAccidentalMode.ForceNatural,
+            NoteAccidentalMode.ForceSharp,
+            NoteAccidentalMode.ForceDoubleSharp
+        ];
+        for (const track of expected.tracks) {
+            for (const staff of track.staves) {
+                for (const bar of staff.bars) {
+                    for (const voice of bar.voices) {
+                        for (const beat of voice.beats) {
+                            for (const note of beat.notes) {
+                                if (!note.isPercussion && note.accidentalMode !== NoteAccidentalMode.Default) {
+                                    const spelling = ModelUtils.resolveSpelling(
+                                        bar.keySignature,
+                                        note.displayValueWithoutBend,
+                                        note.accidentalMode
+                                    );
+                                    note.accidentalMode = forcedModes[spelling.accidentalOffset + 2];
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         const expectedJson = JsonConverter.scoreToJsObject(expected);
         const actualJson = JsonConverter.scoreToJsObject(actual);
