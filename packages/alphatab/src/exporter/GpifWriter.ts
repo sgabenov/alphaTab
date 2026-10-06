@@ -1604,6 +1604,12 @@ export class GpifWriter {
     }
 
     private _writeMasterBarNode(parent: XmlNode, masterBar: MasterBar) {
+        if (masterBar.index > 0 && masterBar.isAnacrusis) {
+            Logger.warning(
+                'GpifWriter',
+                `UnsupportedInternalPickup: bar ${masterBar.index + 1}: GP export only writes the initial pickup flag; this internal pickup flag is not preserved.`
+            );
+        }
         const masterBarNode = parent.addElement('MasterBar');
 
         const key = masterBarNode.addElement('Key');
