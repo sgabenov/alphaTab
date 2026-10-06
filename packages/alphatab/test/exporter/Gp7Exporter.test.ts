@@ -18,6 +18,7 @@ import type { Score } from '@coderline/alphatab/model/Score';
 import { Settings } from '@coderline/alphatab/Settings';
 import { XmlDocument } from '@coderline/alphatab/xml/XmlDocument';
 import { ZipReader } from '@coderline/alphatab/zip/ZipReader';
+import { Gp7ExportAssertions } from 'test/exporter/Gp7ExportAssertions';
 import { ComparisonHelpers } from 'test/model/ComparisonHelpers';
 import { TestPlatform } from 'test/TestPlatform';
 import { describe, expect, it } from 'vitest';
@@ -57,6 +58,7 @@ describe('Gp7ExporterTest', () => {
 
         const fileName = name.substr(name.lastIndexOf('/') + 1);
         const exported = exportGp7(expected);
+        Gp7ExportAssertions.writtenPitches(expected, exported);
         const actual = prepareImporterWithBytes(exported).readScore();
 
         // GPIF infers forced accidental modes from its absolute spelling.
