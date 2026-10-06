@@ -43,6 +43,7 @@ import { SlideInType } from '@coderline/alphatab/model/SlideInType';
 import { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
 import type { Staff } from '@coderline/alphatab/model/Staff';
 import type { Track } from '@coderline/alphatab/model/Track';
+import { TremoloPickingStyle } from '@coderline/alphatab/model/TremoloPickingEffect';
 import { TripletFeel } from '@coderline/alphatab/model/TripletFeel';
 import { Tuning } from '@coderline/alphatab/model/Tuning';
 import { VibratoType } from '@coderline/alphatab/model/VibratoType';
@@ -583,6 +584,12 @@ export class GpifWriter {
             beatNode.addElement('Fadding').innerText = FadeType[beat.fade];
         }
         if (beat.isTremolo) {
+            if (beat.tremoloPicking!.style === TremoloPickingStyle.BuzzRoll) {
+                Logger.warning(
+                    'GpifWriter',
+                    `UnsupportedBuzzRoll: track ${beat.voice.bar.staff.track.index + 1}, staff ${beat.voice.bar.staff.index + 1}, bar ${beat.voice.bar.index + 1}, voice ${beat.voice.index + 1}, beat ${beat.index + 1}: exported as ordinary tremolo; buzz-roll style is not preserved.`
+                );
+            }
             switch (beat.tremoloPicking!.marks) {
                 case 1:
                     beatNode.addElement('Tremolo').innerText = '1/2';
