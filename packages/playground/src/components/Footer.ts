@@ -19,6 +19,7 @@ injectStyles(
 
 export interface FooterOptions {
     trackList?: TrackList;
+    beforePlay?: () => void;
 }
 
 export class Footer implements Mountable {
@@ -40,7 +41,7 @@ export class Footer implements Mountable {
         this.transport = mount(
             this.root,
             '.cmp-transport',
-            new TransportBar(api, { trackList: options.trackList })
+            new TransportBar(api, { trackList: options.trackList, beforePlay: options.beforePlay })
         );
     }
 

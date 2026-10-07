@@ -83,6 +83,9 @@ export function buildSettings(options: ControlAppOptions, viewport: HTMLElement)
         },
         player: {
             playerMode: alphaTab.PlayerMode.EnabledAutomatic,
+            enableSeekToClick: false,
+            enablePlaybackRangeSelection: false,
+            enableElementHighlighting: false,
             scrollOffsetX: -10,
             scrollOffsetY: -20,
             soundFont: options.soundFont ?? Paths.soundFont,
@@ -130,15 +133,19 @@ export class ControlApp implements Mountable {
             console.error('alphaTab error', e);
         });
 
+        this.selectionHandles = new SelectionHandles(this.api, canvas);
+        canvas.appendChild(this.selectionHandles.root);
+
         this.overlay = mount(this.root, '.cmp-overlay', new LoadingOverlay(this.api));
         this.sidebar = mount(this.root, '.cmp-sidebar', new Sidebar(this.api));
         this.footer = mount(
             this.root,
             '.cmp-footer',
-            new Footer(this.api, { trackList: this.sidebar.trackList })
+            new Footer(this.api, {
+                trackList: this.sidebar.trackList,
+                beforePlay: () => this.selectionHandles.preparePlayback()
+            })
         );
-        this.selectionHandles = new SelectionHandles(this.api, viewport, canvas);
-        canvas.appendChild(this.selectionHandles.root);
         this.crosshair = new Crosshair();
         this.dragDrop = new DragDrop(this.api, {
             onEnter: () => this.overlay.enterDrag(),

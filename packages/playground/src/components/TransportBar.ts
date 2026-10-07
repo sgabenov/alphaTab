@@ -94,6 +94,7 @@ const SCROLL_ITEMS: DropdownItem<alphaTab.ScrollMode>[] = [
 
 export interface TransportBarOptions {
     trackList?: TrackList;
+    beforePlay?: () => void;
 }
 
 export class TransportBar implements Mountable {
@@ -168,7 +169,12 @@ export class TransportBar implements Mountable {
             new IconButton({ icon: Icons.Play, tooltip: 'Play/Pause' })
         );
         this.playPause.setEnabled(false);
-        this.playPause.onClick = () => api.playPause();
+        this.playPause.onClick = () => {
+            if (api.playerState !== alphaTab.synth.PlayerState.Playing) {
+                options.beforePlay?.();
+            }
+            api.playPause();
+        };
 
         const speed = mount(
             this.root,
