@@ -8,7 +8,7 @@ injectStyles(
         --at-selection: rgba(67, 109, 157, 0.08);
         --at-selection-border: #6988ab;
         --at-selection-edge: #315d8a;
-        --at-cursor-bar: rgba(40, 68, 111, 0.07);
+        --at-cursor-bar: rgba(255, 242, 0, 0.18);
         --at-cursor-beat: #c35b25;
     }
     /* Escape the cursor wrapper's stacking context so only handles sit above notation. */
