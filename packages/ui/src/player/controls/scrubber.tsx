@@ -31,7 +31,19 @@ export const Scrubber: React.FC<ScrubberProps> = ({
     onSeek,
     onSeekBar,
 }) => {
-    const W = compact ? 400 : 600;
+    const wrapperRef = React.useRef<HTMLDivElement>(null);
+    const [width, setWidth] = React.useState(compact ? 400 : 600);
+    React.useLayoutEffect(() => {
+        const node = wrapperRef.current;
+        if (!node) { return; }
+        const observer = new ResizeObserver(([entry]) => {
+            if (entry && entry.contentRect.width > 0) { setWidth(entry.contentRect.width); }
+        });
+        observer.observe(node);
+        return () => observer.disconnect();
+    }, []);
+
+    const W = width;
     const tempoH = compact ? 0 : 12;
     const trackY = compact ? 8 : 22;
     const labelY = compact ? 16 : 32;
@@ -39,7 +51,10 @@ export const Scrubber: React.FC<ScrubberProps> = ({
     const safeTotal = Math.max(1, totalBars);
     const xOf = (bar: number) => (Math.max(0, Math.min(bar, safeTotal)) / safeTotal) * W;
     const cursorX = xOf(Math.max(0, Math.min(currentBar, safeTotal)));
-    const labelStops = [0, 16, 32, 48, 64].filter((b) => b > 0 && b < safeTotal);
+    // Keep labels and ticks readable as the available width changes.
+    const labelStep = 2 ** Math.max(0, Math.ceil(Math.log2((safeTotal * 40) / W)));
+    const tickStep = 2 ** Math.max(0, Math.ceil(Math.log2((safeTotal * 4) / W)));
+    const labelStops = Array.from({ length: Math.ceil(safeTotal / labelStep) - 1 }, (_, i) => (i + 1) * labelStep);
     // Drop tempo markers whose label would collide with the previously kept one.
     // Scores with many close-spaced tempo automations would otherwise stack
     // their labels into unreadable overlaps.
@@ -56,7 +71,6 @@ export const Scrubber: React.FC<ScrubberProps> = ({
         }
     }
 
-    const wrapperRef = React.useRef<HTMLDivElement>(null);
     const [drag, setDrag] = React.useState(false);
 
     const seekAtClientX = React.useCallback(
@@ -203,10 +217,11 @@ export const Scrubber: React.FC<ScrubberProps> = ({
                     strokeLinecap="round"
                 />
 
-                {Array.from({ length: safeTotal + 1 }).map((_, b) => {
+                {Array.from({ length: Math.floor(safeTotal / tickStep) + 1 }).map((_, i) => {
+                    const b = i * tickStep;
                     const x = xOf(b);
-                    const major = b % 16 === 0;
-                    const mid = b % 4 === 0;
+                    const major = b % labelStep === 0;
+                    const mid = b % Math.max(tickStep, labelStep / 4) === 0;
                     const h = major ? 5 : mid ? 3 : 1.5;
                     const op = major ? 0.8 : mid ? 0.5 : 0.28;
                     return (
