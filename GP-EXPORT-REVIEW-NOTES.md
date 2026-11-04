@@ -48,6 +48,13 @@ code. They should be considered separate proposals for upstream review.
   suites, and an independent CI run remain to be verified. Do not claim
   universal support for MIDI dynamics or GP versions.
 
+- On Windows with Git `core.autocrlf=true`, the full `Gp7Exporter.test.ts`
+  initially reported two snapshot failures (`percussion-articulations` and
+  `sound-mapper`): their checked-out snapshots had CRLF while generated strings
+  used LF. Temporarily normalizing those two snapshots to LF yielded 29/29
+  passing tests; the original checkout bytes were restored afterward. This is
+  an environment-specific verification, not a permanent fix for the checkout.
+
 ## Before proposing upstream
 
 Review the three topics separately with maintainers; they may belong in
