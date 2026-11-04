@@ -6,22 +6,26 @@ fork. It is not yet an upstream pull request. The base is alphaTab develop
 
 ## Changes and motivation
 
-1. **Per-note Guitar Pro dynamics** (`a8810f5c`): add optional `gpVelocity`
+1. **Per-note Guitar Pro dynamics**: add optional `gpVelocity`
    and `gpRelativeVelocity` fields to `Note`, preserve them in GPIF import and
    export, and include them in generated cloning/serialization code. This
    lets a caller retain Guitar Pro-specific per-note values when writing a
    score. The fields are not used by alphaTab playback. A follow-up preserves
    fractional relative values when importing GPIF.
-2. **Audio panel visibility** (`76616c17`): if a GP export contains an embedded
+2. **Audio panel visibility**: if a GP export contains an embedded
    backing-track asset, add `Content/Preferences.json` requesting a visible
    backing-track panel in Guitar Pro. alphaTab already supported writing the
    backing-track asset and synchronization metadata before this change; this
    commit only adds the display preference. Files without an embedded asset do
    not receive that preference.
-3. **Fractional tempo** (`b371e92f`): stop truncating initial and subsequent
+3. **Fractional tempo**: stop truncating initial and subsequent
    tempo values in GPIF writer output, preserving fractional values present in
    the score model. The separate score-model fallback is still integer-valued;
    the test explicitly records that limitation.
+
+The initial three topics are combined in commit `5291e636` on this review
+branch; subsequent commits refine fractional velocity and the generated C#
+code. They should be considered separate proposals for upstream review.
 
 ## Evidence and limits
 
