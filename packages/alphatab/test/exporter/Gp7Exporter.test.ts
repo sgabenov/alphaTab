@@ -779,6 +779,20 @@ describe('Gp7ExporterTest', () => {
         expect(result.gpRelativeVelocity).toBe(2);
     });
 
+    it('preserves fractional relative velocity through repeated GP export and import', () => {
+        for (const relative of [2.75, -1.5]) {
+            const score = ScoreLoader.loadAlphaTex('\\\\track { instrument percussion } \\\\clef neutral \\\\articulation defaults "Kick (hit) 2".4');
+            const note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
+            note.gpVelocity = 100;
+            note.gpRelativeVelocity = relative;
+            const imported = prepareImporterWithBytes(exportGp7(score)).readScore();
+            const roundTripped = prepareImporterWithBytes(exportGp7(imported)).readScore();
+            const result = roundTripped.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
+            expect(result.gpVelocity).toBe(100);
+            expect(result.gpRelativeVelocity).toBe(relative);
+        }
+    });
+
     it('opens the Guitar Pro audio panel only when embedded audio is present', () => {
         const score = ScoreLoader.loadAlphaTex('3.3.4');
         const entriesWithoutAudio = new ZipReader(ByteBuffer.fromBuffer(exportGp7(score)), new Settings().importer.maxDecodingBufferSize).read();

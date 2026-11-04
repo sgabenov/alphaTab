@@ -2266,7 +2266,7 @@ export class GpifParser {
                     note.gpVelocity = GpifParser._parseIntSafe(c.innerText, 0);
                     break;
                 case 'RelativeVelocity':
-                    note.gpRelativeVelocity = GpifParser._parseIntSafe(c.innerText, 0);
+                    note.gpRelativeVelocity = GpifParser._parseFloatSafe(c.innerText, 0);
                     break;
                 case 'AntiAccent':
                     if (c.innerText.toLowerCase() === 'normal') {

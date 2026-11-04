@@ -10,8 +10,8 @@ fork. It is not yet an upstream pull request. The base is alphaTab develop
    and `gpRelativeVelocity` fields to `Note`, preserve them in GPIF import and
    export, and include them in generated cloning/serialization code. This
    lets a caller retain Guitar Pro-specific per-note values when writing a
-   score. The fields are not used by alphaTab playback. Import currently parses
-   these values as integers; fractional relative values do not round-trip.
+   score. The fields are not used by alphaTab playback. A follow-up preserves
+   fractional relative values when importing GPIF.
 2. **Audio panel visibility** (`76616c17`): if a GP export contains an embedded
    backing-track asset, add `Content/Preferences.json` requesting a visible
    backing-track panel in Guitar Pro. alphaTab already supported writing the
@@ -25,7 +25,7 @@ fork. It is not yet an upstream pull request. The base is alphaTab develop
 
 ## Evidence and limits
 
-- The added exporter tests cover GP round-trip of integer note fields, audio
+- The added exporter tests cover GP round-trip of integer and fractional note fields, audio
   preference presence/absence, and fractional tempo automations. They do not
   prove playback behavior across Guitar Pro versions or alphaTab platforms.
 - Previously tested real drum exercises opened in Guitar Pro 8.1.4 with notes
@@ -50,4 +50,3 @@ accepted issue before opening a pull request, and AI-authored submissions must
 include its exact disclosure. Reproduce each issue with the required runtime
 information, check cross-platform behavior and documentation, and remove or
 relocate this fork-specific review note before an upstream PR if appropriate.
-
