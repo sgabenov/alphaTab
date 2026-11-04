@@ -210,6 +210,13 @@ export class GpifWriter {
 
         this._writeNoteProperties(noteNode, note);
 
+        if (note.gpVelocity !== null) {
+            noteNode.addElement('Velocity').innerText = note.gpVelocity.toString();
+        }
+        if (note.gpRelativeVelocity !== null) {
+            noteNode.addElement('RelativeVelocity').innerText = note.gpRelativeVelocity.toString();
+        }
+
         if (note.isGhost) {
             noteNode.addElement('AntiAccent').innerText = 'normal';
         }
@@ -971,7 +978,7 @@ export class GpifWriter {
             initialTempoAutomation.addElement('Bar').innerText = '0';
             initialTempoAutomation.addElement('Position').innerText = '0';
             initialTempoAutomation.addElement('Visible').innerText = 'true';
-            initialTempoAutomation.addElement('Value').innerText = `${score.tempo | 0} 2`;
+            initialTempoAutomation.addElement('Value').innerText = `${score.tempo} 2`;
             if (score.tempoLabel) {
                 initialTempoAutomation.addElement('Text').innerText = score.tempoLabel;
             }
@@ -997,7 +1004,7 @@ export class GpifWriter {
                 tempoAutomation.addElement('Bar').innerText = mb.index.toString();
                 tempoAutomation.addElement('Position').innerText = automation.ratioPosition.toString();
                 tempoAutomation.addElement('Visible').innerText = automation.isVisible ? 'true' : 'false';
-                tempoAutomation.addElement('Value').innerText = `${automation.value | 0} 2`;
+                tempoAutomation.addElement('Value').innerText = `${automation.value} 2`;
                 if (automation.text) {
                     tempoAutomation.addElement('Text').innerText = automation.text;
                 }

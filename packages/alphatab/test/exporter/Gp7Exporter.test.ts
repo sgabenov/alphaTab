@@ -11,6 +11,7 @@ import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
 import { IOHelper } from '@coderline/alphatab/io/IOHelper';
 import { TechniqueSymbolPlacement } from '@coderline/alphatab/model/InstrumentArticulation';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
+import { BackingTrack } from '@coderline/alphatab/model/BackingTrack';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Score } from '@coderline/alphatab/model/Score';
 import { Settings } from '@coderline/alphatab/Settings';
@@ -41,6 +42,22 @@ describe('Gp7ExporterTest', () => {
     function exportGp7(score: Score): Uint8Array {
         return new Gp7Exporter().export(score, null);
     }
+
+    it('preserves fractional initial and later tempos', () => {
+        const xml = `<?xml version="1.0" encoding="UTF-8"?>
+        <score-partwise version="3.1"><part-list><score-part id="P1"><part-name>Piano</part-name></score-part></part-list>
+        <part id="P1"><measure number="1"><attributes><divisions>1</divisions><time><beats>4</beats><beat-type>4</beat-type></time></attributes>
+        <direction><sound tempo="120.5"/></direction><note><pitch><step>C</step><octave>4</octave></pitch><duration>4</duration><type>whole</type></note></measure>
+        <measure number="2"><direction><sound tempo="100.5"/></direction><note><pitch><step>D</step><octave>4</octave></pitch><duration>4</duration><type>whole</type></note></measure></part></score-partwise>`;
+        const score = ScoreLoader.loadScoreFromBytes(new TextEncoder().encode(xml));
+        const result = prepareImporterWithBytes(exportGp7(score)).readScore();
+        expect(result.masterBars[0].tempoAutomations[0].value).toBe(120.5);
+        expect(result.masterBars[1].tempoAutomations[0].value).toBe(100.5);
+
+        score.masterBars[0].tempoAutomations = [];
+        const fallback = prepareImporterWithBytes(exportGp7(score)).readScore();
+        expect(fallback.masterBars[0].tempoAutomations[0].value).toBe(120);
+    });
 
     async function testRoundTripEqual(name: string, ignoreKeys: string[] | null): Promise<void> {
         const expected = await loadScore(name);
@@ -750,6 +767,29 @@ describe('Gp7ExporterTest', () => {
         xml.parse(IOHelper.toString(gpifData, ''));
         return readFullInstrumentSet(xml);
     }
+
+    it('preserves per-note Guitar Pro velocity fields through export and import', () => {
+        const score = ScoreLoader.loadAlphaTex('\\track { instrument percussion } \\clef neutral \\articulation defaults \"Kick (hit) 2\".4');
+        const note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
+        note.gpVelocity = 127;
+        note.gpRelativeVelocity = 2;
+        const imported = prepareImporterWithBytes(exportGp7(score)).readScore();
+        const result = imported.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
+        expect(result.gpVelocity).toBe(127);
+        expect(result.gpRelativeVelocity).toBe(2);
+    });
+
+    it('opens the Guitar Pro audio panel only when embedded audio is present', () => {
+        const score = ScoreLoader.loadAlphaTex('3.3.4');
+        const entriesWithoutAudio = new ZipReader(ByteBuffer.fromBuffer(exportGp7(score)), new Settings().importer.maxDecodingBufferSize).read();
+        expect(entriesWithoutAudio.some(e => e.fileName.endsWith('Preferences.json'))).toBe(false);
+        score.backingTrack = new BackingTrack();
+        score.backingTrack.rawAudioFile = new Uint8Array([1, 2, 3, 4]);
+        const entries = new ZipReader(ByteBuffer.fromBuffer(exportGp7(score)), new Settings().importer.maxDecodingBufferSize).read();
+        const preferences = entries.find(e => e.fileName.endsWith('Preferences.json'));
+        expect(preferences).toBeDefined();
+        expect(JSON.parse(IOHelper.toString(preferences!.data, '')).view.backingTrackVisible).toBe(true);
+    });
 
     it('drumkit-roundtrip', async () => {
         const inputData = await TestPlatform.loadFile('test-data/exporter/articulations.gp');
