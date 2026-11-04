@@ -210,11 +210,13 @@ export class GpifWriter {
 
         this._writeNoteProperties(noteNode, note);
 
-        if (note.gpVelocity !== null) {
-            noteNode.addElement('Velocity').innerText = note.gpVelocity.toString();
+        const gpVelocity = note.gpVelocity;
+        if (gpVelocity !== null) {
+            noteNode.addElement('Velocity').innerText = gpVelocity.toString();
         }
-        if (note.gpRelativeVelocity !== null) {
-            noteNode.addElement('RelativeVelocity').innerText = note.gpRelativeVelocity.toString();
+        const gpRelativeVelocity = note.gpRelativeVelocity;
+        if (gpRelativeVelocity !== null) {
+            noteNode.addElement('RelativeVelocity').innerText = gpRelativeVelocity.toString();
         }
 
         if (note.isGhost) {

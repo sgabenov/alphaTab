@@ -38,9 +38,11 @@ fork. It is not yet an upstream pull request. The base is alphaTab develop
   output and MIDI export both yielded velocities 26, 64, 76, 80, 113, 64, 76,
   80 for offsets -15.5, 0.5, 3.75, 4.25, 10.75, 0.75, 3.5, 4.5. This does
   not rule out other settings or representations.
-- TS exporter tests and local Windows build have been checked; C# and Kotlin
-  behavior, broader regression suites, and a real independent CI run remain to
-  be verified. Do not claim universal support for MIDI dynamics or GP versions.
+- Targeted TS exporter tests passed on Windows. On Linux WSL with .NET SDK
+  8.0.427, the C# library and test project compiled and the generated fractional
+  velocity round-trip test passed. Kotlin runtime behavior, broader regression
+  suites, and an independent CI run remain to be verified. Do not claim
+  universal support for MIDI dynamics or GP versions.
 
 ## Before proposing upstream
 

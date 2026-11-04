@@ -802,7 +802,7 @@ describe('Gp7ExporterTest', () => {
         const entries = new ZipReader(ByteBuffer.fromBuffer(exportGp7(score)), new Settings().importer.maxDecodingBufferSize).read();
         const preferences = entries.find(e => e.fileName.endsWith('Preferences.json'));
         expect(preferences).toBeDefined();
-        expect(JSON.parse(IOHelper.toString(preferences!.data, '')).view.backingTrackVisible).toBe(true);
+        expect(IOHelper.toString(preferences!.data, '')).toContain('"backingTrackVisible":true');
     });
 
     it('drumkit-roundtrip', async () => {
