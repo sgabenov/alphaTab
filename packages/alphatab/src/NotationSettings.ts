@@ -212,7 +212,7 @@ export enum NotationElement {
     EffectLetRing = 23,
 
     /**
-     * The lyrics of the track shown above the staff.
+     * The lyrics of the track, placed as configured in `RenderStylesheet.lyricsPlacement`.
      */
     EffectLyrics = 24,
 
@@ -487,7 +487,7 @@ export class NotationSettings {
      * settings.Notation.Elements[AlphaTab.NotationElement.TrackNames] = false;
      * ```
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val settings = AlphaTab.Settings();
      * settings.notation.elements[alphaTab.NotationElement.ScoreTitle] = false;

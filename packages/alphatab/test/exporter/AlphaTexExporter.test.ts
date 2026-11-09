@@ -4,6 +4,7 @@ import { AlphaTexErrorWithDiagnostics } from '@coderline/alphatab/importer/Alpha
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { DynamicValue } from '@coderline/alphatab/model/DynamicValue';
 import { StaffPlacement, SystemDisplay } from '@coderline/alphatab/model/ElementDisplay';
+import { NumberedNoteMode } from '@coderline/alphatab/model/StaffConfigs';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
 import { BarNumberDisplay } from '@coderline/alphatab/model/RenderStylesheet';
@@ -297,6 +298,23 @@ describe('AlphaTexExporterTest', () => {
         ComparisonHelpers.alphaTexExportRoundtripEqual('accidental-mode-only-when-needed', reimported, score);
     });
 
+    it('tuning-spellings', () => {
+        const score = ScoreLoader.loadAlphaTex('\\tuning (D#4 Bb3 Gb3 C#3 Ab2 Eb2) . 0.6');
+        const exported = exportAlphaTex(score);
+        expect(exported).toContain('\\tuning (D#4 Bb3 Gb3 C#3 Ab2 Eb2)');
+
+        const reimported = ScoreLoader.loadAlphaTex(exported);
+        const tuning = reimported.tracks[0].staves[0].stringTuning;
+        expect(tuning.pitches.map(p => p.toString())).toEqual(['D#4', 'Bb3', 'Gb3', 'C#3', 'Ab2', 'Eb2']);
+        ComparisonHelpers.alphaTexExportRoundtripEqual('tuning-spellings', reimported, score);
+    });
+
+    it('tuning-values-use-flats', () => {
+        const score = ScoreLoader.loadAlphaTex('\\tuning (E4 B3 G3 D3 A2 E2) . 0.6');
+        score.tracks[0].staves[0].stringTuning.tunings = [63, 58, 54, 49, 44, 39];
+        expect(exportAlphaTex(score)).toContain('\\tuning (Eb4 Bb3 Gb3 Db3 Ab2 Eb2)');
+    });
+
     it('staff-display', () => {
         const score = ScoreLoader.loadAlphaTex(
             '\\track \\staff {score tabs} \\tuning (E4 B3 G3 D3 A2 E2) 3.3.4 3.3 3.3 3.3 | 3.3 3.3 3.3 3.3 | 3.3 3.3 3.3 3.3'
@@ -331,5 +349,22 @@ describe('AlphaTexExporterTest', () => {
 
         const reimported = ScoreLoader.loadAlphaTex(exportAlphaTex(score));
         ComparisonHelpers.alphaTexExportRoundtripEqual('staff-display', reimported, score);
+    });
+
+    it('staff-display-numbered-notes', () => {
+        const score = ScoreLoader.loadAlphaTex('\\track \\staff {numbered} C4 | \\track \\staff {numbered} C4');
+        score.stylesheet.numberedConfig.notes = NumberedNoteMode.SingleNote;
+        score.tracks[1].staves[0].numberedConfig = { notes: NumberedNoteMode.AllNotes };
+
+        const exported = exportAlphaTex(score)
+            .split('\n')
+            .map(l => l.trim())
+            .join(' ');
+
+        expect(exported).toContain('\\defaultStaffDisplay numbered { notes SingleNote }');
+        expect(exported).toContain('\\staffDisplay numbered { notes AllNotes }');
+
+        const reimported = ScoreLoader.loadAlphaTex(exportAlphaTex(score));
+        ComparisonHelpers.alphaTexExportRoundtripEqual('staff-display-numbered-notes', reimported, score);
     });
 });

@@ -22,3 +22,75 @@ Guitar tabs of a track transposed with [`notation.transpositionPitches`](/docs/r
 `}</AlphaTab>
 
 The loaded score is not changed: the new positions exist only on the rendered tab. Details: [Transposed tablature](/docs/features/render/guitar-tablature#transposed-tablature).
+
+#### render: chords and multiple voices on numbered staves
+https://github.com/CoderLine/alphaTab/issues/2437
+
+Numbered staves write every note instead of a single digit per beat. A chord is a stack of digits with the lowest note at the bottom, each with its own octave dots, accidental and augmentation dot; the duration lines stay with the lowest digit. Every voice is written on its own row, the first voice on top, with beats lined up in time.
+
+<AlphaTab tex={true}>{`
+\\track "Piano"
+  \\staff {score numbered}
+  \\voice
+    :4 (E4 G4 C5) (F4 A4 C5) (G4 B4 D5) (E4 G4 C5) | :2 (D4 F4 B4) (C4 E4 C5)
+  \\voice
+    :8 C3 G3 E4 G3 F3 C4 A3 C4 | :4 G2 G3 :2 C3
+`}</AlphaTab>
+
+The previous display with a single digit of the first voice, as in Guitar Pro, is available as the new [`NumberedNoteMode.SingleNote`](/docs/reference/types/model/numberednotemode); it now shows the highest note of a chord. Details: [Chords and multiple voices](/docs/features/render/numbered-notation#chords-and-multiple-voices).
+
+#### render: lyrics above or below the staff, or hidden
+https://github.com/CoderLine/alphaTab/issues/2776
+
+The new [`score.stylesheet.lyricsPlacement`](/docs/reference/types/model/renderstylesheet/#lyricsplacement) places lyrics [`LyricsPlacement.Below`](/docs/reference/types/model/lyricsplacement) (default) or `LyricsPlacement.Above` the standard notation staff, or hides them with `LyricsPlacement.Hidden`, like the lyrics setting of the Guitar Pro stylesheet. Without standard notation, the lyrics move to the next shown staff (tablature, slash, numbered). alphaTex sets it with `\lyricsPlacement`, the Guitar Pro importer and exporter read and write it, and the MusicXML importer sets `Above` when all lyrics are placed above the staff. Details: [Lyrics placement](/docs/features/render/coverage-lyrics#placement).
+
+<AlphaTab tex={true}>{`
+\\lyricsPlacement above
+\\track "Guitar"
+\\staff {score tabs}
+\\lyrics "Bend it up and let it ring"
+:4 7.3{b (0 4)} 9.3 :8 7.3 9.3 :4 7.2{v} | :2 9.3{b (0 4 0)} 7.3
+`}</AlphaTab>
+
+#### render: sharp and flat tunings
+https://github.com/CoderLine/alphaTab/issues/2802
+
+Tunings keep the sharp or flat spelling of the source file per string, and the score tuning and the staff tuning show the accidentals as ♯ and ♭. alphaTex keeps the spelling written in `\tuning` and writes it back on export, the Guitar Pro importer and exporter read and write the sharp or flat choice of the tuning, and the MusicXML importer reads the spelling from `tuning-step` and `tuning-alter`. The new [`Tuning.pitches`](/docs/reference/types/model/tuning/#pitches) holds the written pitch of every string as a [`SpelledPitch`](/docs/reference/types/model/spelledpitch); [`Tuning.tunings`](/docs/reference/types/model/tuning/#tunings) gives the MIDI values of the same strings. Details: [Sharp and flat tunings](/docs/features/render/tuning-display#sharp-and-flat-tunings).
+
+<AlphaTab tex={true}>{`
+\\track "Guitar"
+\\staff {tabs}
+\\tuning (D#4 Bb3 Gb3 C#3 Ab2 Eb2)
+:4 0.6 2.5 2.4 0.3 | 0.2 2.3 0.1 r
+`}</AlphaTab>
+
+### Kotlin
+
+#### kotlin: platform-independent alphaTab-core library
+https://github.com/CoderLine/alphaTab/issues/2458
+
+alphaTab for Kotlin is published as two packages, like the .NET version. The new [`net.alphatab:alphaTab-core`](https://central.sonatype.com/artifact/net.alphatab/alphaTab-core) runs on any JVM 17 or newer: load files, render to PNG or SVG through alphaSkia, generate MIDI and synthesize audio on servers, in command-line tools or in desktop applications. [`net.alphatab:alphaTab`](https://central.sonatype.com/artifact/net.alphatab/alphaTab) stays the Android library with the `AlphaTabView` and is built on top of the core. Details: [Platforms and packages](/docs/platforms) and [Render on the JVM](/docs/getting-started/installation-kotlin#render-on-the-jvm).
+
+### Upgrade Notes
+
+#### Visual changes
+
+* Low octave dots on numbered staves sit below the duration lines instead of between digit and lines, as in printed jiǎnpǔ.
+* Numbered staves show all notes of chords and all voices. Set `notes` of the numbered staff configuration to `NumberedNoteMode.SingleNote` (alphaTex: `\defaultStaffDisplay numbered { notes singleNote }`) for one digit per beat; see [Single note mode](/docs/features/render/numbered-notation#single-note-mode).
+* Tuning names show the accidental as `♭` and `♯` (`E♭`) instead of the letter `b` (`Eb`).
+* Guitar Pro tunings with accidentals are written with sharps unless the file marks them as flat, like in Guitar Pro. Guitar Pro 6 files have no such mark and show sharps.
+* Lyrics of tab-only tracks are shown below the tab staff instead of above it. With standard notation and tabs, they sit directly below the standard notation staff. Set [`score.stylesheet.lyricsPlacement`](/docs/reference/types/model/renderstylesheet/#lyricsplacement) to `LyricsPlacement.Above` (alphaTex: `\lyricsPlacement above`) to show them above the staff.
+
+#### Tuning pitches
+
+* [`Tuning.pitches`](/docs/reference/types/model/tuning/#pitches) is the stored tuning, [`Tuning.tunings`](/docs/reference/types/model/tuning/#tunings) is derived from it. Assign a new array to change a tuning: changing the array returned by `tunings` in place does not change the tuning anymore.
+* The score JSON stores the tuning as `pitches` with the written names like `"D#4"`. JSON with the `tunings` values of earlier versions is still read.
+
+#### Deprecated APIs
+
+* `Tuning.noteNames`, `Tuning.getTextForTuning` and `Tuning.getTextPartsForTuning` are deprecated and keep their behavior. Use [`Tuning.pitches`](/docs/reference/types/model/tuning/#pitches) and [`SpelledPitch`](/docs/reference/types/model/spelledpitch) for the written name of a string.
+
+#### Kotlin packages
+
+* Android apps need no change: `net.alphatab:alphaTab` brings in `net.alphatab:alphaTab-core` in the same version. Builds that do not resolve transitive dependencies must add `alphaTab-core` themselves.
+* The Android installation page moved to [Installation (Kotlin)](/docs/getting-started/installation-kotlin); the old address redirects there.

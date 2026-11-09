@@ -138,6 +138,7 @@ import { RenderStylesheet } from "@coderline/alphatab/model/RenderStylesheet";
 import { RenderStylesheetSerializer } from "@coderline/alphatab/generated/model/RenderStylesheetSerializer";
 import { BracketExtendMode } from "@coderline/alphatab/model/RenderStylesheet";
 import { TuningDisplayMode } from "@coderline/alphatab/model/RenderStylesheet";
+import { LyricsPlacement } from "@coderline/alphatab/model/RenderStylesheet";
 import { TrackNamePolicy } from "@coderline/alphatab/model/RenderStylesheet";
 import { TrackNameMode } from "@coderline/alphatab/model/RenderStylesheet";
 import { TrackNameOrientation } from "@coderline/alphatab/model/RenderStylesheet";
@@ -162,6 +163,7 @@ import { ScoreStaffConfigSerializer } from "@coderline/alphatab/generated/model/
 import { TabStaffConfigSerializer } from "@coderline/alphatab/generated/model/TabStaffConfigSerializer";
 import { SlashStaffConfigSerializer } from "@coderline/alphatab/generated/model/SlashStaffConfigSerializer";
 import { NumberedStaffConfigSerializer } from "@coderline/alphatab/generated/model/NumberedStaffConfigSerializer";
+import { NumberedNoteMode } from "@coderline/alphatab/model/StaffConfigs";
 import { TrackStyle } from "@coderline/alphatab/model/Track";
 import { TrackStyleSerializer } from "@coderline/alphatab/generated/model/TrackStyleSerializer";
 import { TrackSubElement } from "@coderline/alphatab/model/Track";
@@ -169,6 +171,7 @@ import { TrackSerializer } from "@coderline/alphatab/generated/model/TrackSerial
 import { TremoloPickingEffectSerializer } from "@coderline/alphatab/generated/model/TremoloPickingEffectSerializer";
 import { TremoloPickingStyle } from "@coderline/alphatab/model/TremoloPickingEffect";
 import { TuningSerializer } from "@coderline/alphatab/generated/model/TuningSerializer";
+import { SpelledPitch } from "@coderline/alphatab/model/SpelledPitch";
 import { VoiceStyle } from "@coderline/alphatab/model/Voice";
 import { VoiceStyleSerializer } from "@coderline/alphatab/generated/model/VoiceStyleSerializer";
 import { VoiceSubElement } from "@coderline/alphatab/model/Voice";
@@ -435,6 +438,7 @@ export class SerializerFill {
             obj.stemFlagHeight = new Map<Duration, number>();
             obj.stemFlagHeight!.set(SerializerFill.otherEnumValue(Duration, undefined) as Duration, 7.25);
         }
+        obj.numberedChordNoteGap = 7.25;
     }
     public static fillExporterSettings(obj: ExporterSettings, depth: number = 0): void {
         if (depth > 8) {
@@ -1029,6 +1033,7 @@ export class SerializerFill {
         obj.useSystemSignSeparator = !obj.useSystemSignSeparator;
         obj.globalDisplayTuning = !obj.globalDisplayTuning;
         obj.tuningDisplayMode = SerializerFill.otherEnumValue(TuningDisplayMode, obj.tuningDisplayMode) as TuningDisplayMode;
+        obj.lyricsPlacement = SerializerFill.otherEnumValue(LyricsPlacement, obj.lyricsPlacement) as LyricsPlacement;
         {
             obj.perTrackDisplayTuning = new Map<number, boolean>();
             obj.perTrackDisplayTuning!.set(3, true);
@@ -1269,6 +1274,7 @@ export class SerializerFill {
             obj.timeSignature = v0;
         }
         obj.barNumber = SerializerFill.otherEnumValue(BarNumberDisplay, obj.barNumber) as BarNumberDisplay;
+        obj.notes = SerializerFill.otherEnumValue(NumberedNoteMode, obj.notes) as NumberedNoteMode;
     }
     public static fillTrackStyle(obj: TrackStyle, depth: number = 0): void {
         if (depth > 8) {
@@ -1333,7 +1339,8 @@ export class SerializerFill {
         obj.isStandard = !obj.isStandard;
         obj.name = 'x ä€𝄞';
         {
-            obj.tunings = [7.25];
+            obj.pitches = [];
+            obj.pitches.push(new SpelledPitch(3, 1, 4));
         }
     }
     public static fillVoiceStyle(obj: VoiceStyle, depth: number = 0): void {

@@ -52,7 +52,8 @@ export {
     TrackNameMode,
     TrackNameOrientation,
     TuningDisplayMode,
-    BarNumberDisplay
+    BarNumberDisplay,
+    LyricsPlacement
 } from '@coderline/alphatab/model/RenderStylesheet';
 export { RepeatGroup } from '@coderline/alphatab/model/RepeatGroup';
 export { Score, ScoreSubElement, ScoreStyle, HeaderFooterStyle } from '@coderline/alphatab/model/Score';
@@ -60,6 +61,7 @@ export { Section } from '@coderline/alphatab/model/Section';
 export { SimileMark } from '@coderline/alphatab/model/SimileMark';
 export { SlideInType } from '@coderline/alphatab/model/SlideInType';
 export { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
+export { SpelledPitch } from '@coderline/alphatab/model/SpelledPitch';
 export { Staff } from '@coderline/alphatab/model/Staff';
 export { Track, TrackSubElement, TrackStyle } from '@coderline/alphatab/model/Track';
 export { TripletFeel } from '@coderline/alphatab/model/TripletFeel';
@@ -76,11 +78,12 @@ export {
     SystemDisplay,
     type ElementDisplay
 } from '@coderline/alphatab/model/ElementDisplay';
-export type {
-    ScoreStaffConfig,
-    TabStaffConfig,
-    SlashStaffConfig,
-    NumberedStaffConfig
+export {
+    NumberedNoteMode,
+    type ScoreStaffConfig,
+    type TabStaffConfig,
+    type SlashStaffConfig,
+    type NumberedStaffConfig
 } from '@coderline/alphatab/model/StaffConfigs';
 export type {
     ScoreBarOverride,

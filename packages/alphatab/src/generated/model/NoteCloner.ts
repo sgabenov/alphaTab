@@ -53,8 +53,8 @@ export class NoteCloner {
         clone.dynamics = original.dynamics;
         clone.gpVelocity = original.gpVelocity;
         clone.gpRelativeVelocity = original.gpRelativeVelocity;
-        clone.gpNoteOffset = original.gpNoteOffset;
         clone.ornament = original.ornament;
+        clone.gpNoteOffset = original.gpNoteOffset;
         return clone;
     }
 }

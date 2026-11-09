@@ -17,6 +17,7 @@ import { Direction } from '@coderline/alphatab/model/Direction';
 import { Duration } from '@coderline/alphatab/model/Duration';
 import { DynamicValue } from '@coderline/alphatab/model/DynamicValue';
 import { StaffPlacement, SystemDisplay } from '@coderline/alphatab/model/ElementDisplay';
+import { NumberedNoteMode } from '@coderline/alphatab/model/StaffConfigs';
 import { FadeType } from '@coderline/alphatab/model/FadeType';
 import { FermataType } from '@coderline/alphatab/model/Fermata';
 import { Fingers } from '@coderline/alphatab/model/Fingers';
@@ -33,6 +34,7 @@ import { Rasgueado } from '@coderline/alphatab/model/Rasgueado';
 import {
     BarNumberDisplay,
     BracketExtendMode,
+    LyricsPlacement,
     TrackNameMode,
     TrackNameOrientation,
     TrackNamePolicy,
@@ -1849,6 +1851,7 @@ describe('AlphaTexImporterTest', () => {
             \\bracketExtendMode nobrackets
             \\useSystemSignSeparator
             \\tuningDisplayMode staff
+            \\lyricsPlacement above
             \\singleTrackTrackNamePolicy allsystems
             \\multiTrackTrackNamePolicy Hidden
             \\firstSystemTrackNameMode fullname
@@ -1867,6 +1870,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.stylesheet.bracketExtendMode).toBe(BracketExtendMode.NoBrackets);
         expect(score.stylesheet.useSystemSignSeparator).toBe(true);
         expect(score.stylesheet.tuningDisplayMode).toBe(TuningDisplayMode.Staff);
+        expect(score.stylesheet.lyricsPlacement).toBe(LyricsPlacement.Above);
         expect(score.stylesheet.singleTrackTrackNamePolicy).toBe(TrackNamePolicy.AllSystems);
         expect(score.stylesheet.multiTrackTrackNamePolicy).toBe(TrackNamePolicy.Hidden);
         expect(score.stylesheet.firstSystemTrackNameMode).toBe(TrackNameMode.FullName);
@@ -1874,6 +1878,15 @@ describe('AlphaTexImporterTest', () => {
         expect(score.stylesheet.firstSystemTrackNameOrientation).toBe(TrackNameOrientation.Horizontal);
         expect(score.stylesheet.otherSystemsTrackNameOrientation).toBe(TrackNameOrientation.Horizontal);
         testExportRoundtrip(score);
+    });
+
+    it('lyrics-placement', () => {
+        expect(parseTex('.').stylesheet.lyricsPlacement).toBe(LyricsPlacement.Below);
+        expect(parseTex('\\lyricsPlacement below .').stylesheet.lyricsPlacement).toBe(LyricsPlacement.Below);
+
+        const hidden = parseTex('\\lyricsPlacement hidden .');
+        expect(hidden.stylesheet.lyricsPlacement).toBe(LyricsPlacement.Hidden);
+        testExportRoundtrip(hidden);
     });
 
     it('bar-sizing', () => {
@@ -2429,6 +2442,7 @@ describe('AlphaTexImporterTest', () => {
             it('bar optional', () => importErrorTest('. \\section ("a" 1)'));
 
             it('bracketextendmode', () => importErrorTest('\\bracketextendmode invalid'));
+            it('lyricsplacement', () => importErrorTest('\\lyricsplacement invalid'));
             it('singletracktracknamepolicy', () => importErrorTest('\\singletracktracknamepolicy invalid'));
             it('multitracktracknamepolicy', () => importErrorTest('\\multitracktracknamepolicy invalid'));
             it('firstsystemtracknamemode', () => importErrorTest('\\firstsystemtracknamemode invalid'));
@@ -2789,6 +2803,22 @@ describe('AlphaTexImporterTest', () => {
             );
         });
 
+        it('numbered-notes', () => {
+            const score = parseTex(`
+                \\defaultStaffDisplay numbered { notes singleNote }
+                \\track \\staff {score numbered}
+                \\staffDisplay numbered { notes allNotes }
+                C4
+                \\track \\staff {numbered}
+                C4
+            `);
+            expect(score.stylesheet.numberedConfig.notes).toBe(NumberedNoteMode.SingleNote);
+            expect(score.tracks[0].staves[0].numberedConfig!.notes).toBe(NumberedNoteMode.AllNotes);
+            expect(score.tracks[1].staves[0].numberedConfig).toBeUndefined();
+
+            testExportRoundtrip(score);
+        });
+
         it('legacy-shorthands', () => {
             const score = parseTex('\\defaultBarNumberDisplay hide C4 | \\barNumberDisplay allBars C4');
             expect(score.stylesheet.tabConfig.barNumber).toBe(BarNumberDisplay.Hide);
@@ -2864,5 +2894,41 @@ describe('AlphaTexImporterTest', () => {
         const score = parseTex('\\barNumber 0 C4.1 | C4.1 | C4.1');
         expect(score.masterBars.map(mb => mb.barNumberText)).toEqual(['0', '1', '2']);
         expect(score.masterBars[0].customBarNumber).toBe(0);
+    });
+
+    it('tuning-spellings', () => {
+        const score = parseTex('\\tuning (D#4 Bb3 Gb3 c#3 ab2 Fb2) . 0.6');
+        const tuning = score.tracks[0].staves[0].stringTuning;
+        expect(tuning.tunings).toEqual([63, 58, 54, 49, 44, 40]);
+        expect(tuning.pitches.map(p => [p.step, p.alter, p.octave])).toEqual([
+            [1, 1, 4],
+            [6, -1, 3],
+            [4, -1, 3],
+            [0, 1, 3],
+            [5, -1, 2],
+            [3, -1, 2]
+        ]);
+    });
+
+    it('tuning-mode-without-strings', () => {
+        const score = parseTex('\\tuning piano . C4');
+        expect(score.tracks[0].staves[0].stringTuning.pitches).toHaveLength(0);
+    });
+
+    it('pitched-notes-across-octave-boundary', () => {
+        const score = parseTex('\\tuning piano . B#3 B##3 Cb4 Cbb4');
+        const notes = score.tracks[0].staves[0].bars[0].voices[0].beats.map(b => b.notes[0]);
+        expect(notes.map(n => n.tone)).toEqual([12, 13, 11, 10]);
+        expect(notes.map(n => n.octave)).toEqual([4, 4, 4, 4]);
+        expect(notes.map(n => n.realValue)).toEqual([60, 61, 59, 58]);
+    });
+
+    it('rest-display-pitch-across-octave-boundary', () => {
+        const score = parseTex('\\tuning piano . r.4{restDisplayPitch Cb4} r.4{restDisplayPitch B#3}');
+        const beats = score.tracks[0].staves[0].bars[0].voices[0].beats;
+        expect(beats[0].restDisplayTone).toBe(11);
+        expect(beats[0].restDisplayOctave).toBe(3);
+        expect(beats[1].restDisplayTone).toBe(12);
+        expect(beats[1].restDisplayOctave).toBe(3);
     });
 });

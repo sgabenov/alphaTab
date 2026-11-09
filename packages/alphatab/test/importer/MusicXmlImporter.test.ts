@@ -15,7 +15,7 @@ import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { Ottavia } from '@coderline/alphatab/model/Ottavia';
 import { PlaybackInformation } from '@coderline/alphatab/model/PlaybackInformation';
 import type { Note } from '@coderline/alphatab/model/Note';
-import { BarNumberDisplay } from '@coderline/alphatab/model/RenderStylesheet';
+import { BarNumberDisplay, LyricsPlacement } from '@coderline/alphatab/model/RenderStylesheet';
 import type { Score } from '@coderline/alphatab/model/Score';
 import { SimileMark } from '@coderline/alphatab/model/SimileMark';
 import { VibratoType } from '@coderline/alphatab/model/VibratoType';
@@ -364,8 +364,8 @@ describe('MusicXmlImporterTests', () => {
                     );
                     const context = `note ${i}`;
                     expect(bar.index, context).toBe(expected[i][0]);
-                    expect(spelling.degree, context).toBe(expected[i][1]);
-                    expect(spelling.accidentalOffset, context).toBe(expected[i][2]);
+                    expect(spelling.step, context).toBe(expected[i][1]);
+                    expect(spelling.alter, context).toBe(expected[i][2]);
                     expect(spelling.octave, context).toBe(expected[i][3]);
                     i++;
                 }
@@ -425,6 +425,31 @@ describe('MusicXmlImporterTests', () => {
         const trumpet = notes(6, 0)[0];
         expect(trumpet.isDead).toBe(false);
         expect(trumpet.isPalmMute).toBe(false);
+    });
+
+    it('tuning-alter', async () => {
+        const score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml4/tuning-alter.xml');
+        const tuning = score.tracks[0].staves[0].stringTuning;
+
+        // top string first, line 1 is the lowest string
+        // the quarter tone alter of the highest string is truncated
+        expect(tuning.tunings).toEqual([64, 58, 54, 50, 44, 39]);
+        expect(tuning.pitches.map(p => [p.step, p.alter, p.octave])).toEqual([
+            [2, 0, 4],
+            [5, 1, 3],
+            [4, -1, 3],
+            [1, 0, 3],
+            [4, 1, 2],
+            [2, -1, 2]
+        ]);
+        expect(tuning.pitches.map(p => p.toNameString())).toEqual([
+            'E',
+            'A#',
+            'Gb',
+            'D',
+            'G#',
+            'Eb'
+        ]);
     });
 
     it('string-annotation', async () => {
@@ -2071,6 +2096,45 @@ describe('MusicXmlImporterTests', () => {
             };
             expect(tempoPosition('')).toBe(0.25);
             expect(tempoPosition(' sound="yes"')).toBe(0.5);
+        });
+    });
+
+    describe('lyrics-placement', () => {
+        function placement(lyricAttributes: string[]): LyricsPlacement {
+            let notes = '';
+            for (const attributes of lyricAttributes) {
+                notes += `<note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration><type>quarter</type><lyric number="1"${attributes}><text>la</text></lyric></note>`;
+            }
+            const xml = `<?xml version="1.0" encoding="UTF-8"?><score-partwise version="4.0"><part-list><score-part id="P1"><part-name>P1</part-name></score-part></part-list><part id="P1"><measure number="1"><attributes><divisions>1</divisions><time><beats>4</beats><beat-type>4</beat-type></time><clef><sign>G</sign><line>2</line></clef></attributes>${notes}</measure></part></score-partwise>`;
+            const score = MusicXmlImporterTestHelper.prepareImporterWithBytes(IOHelper.stringToBytes(xml)).readScore();
+            return score.stylesheet.lyricsPlacement;
+        }
+
+        it('all-above', () => {
+            expect(placement([' placement="above"', ' placement="above"'])).toBe(LyricsPlacement.Above);
+        });
+
+        it('mixed', () => {
+            expect(placement([' placement="above"', ' placement="below"'])).toBe(LyricsPlacement.Below);
+            expect(placement([' placement="above"', ''])).toBe(LyricsPlacement.Below);
+        });
+
+        it('unspecified', () => {
+            expect(placement(['', ''])).toBe(LyricsPlacement.Below);
+            const noLyrics: string[] = [];
+            expect(placement(noLyrics)).toBe(LyricsPlacement.Below);
+        });
+
+        it('testsuite-mixed-voices', async () => {
+            // voice 1 above, voice 2 below the staff: the score-wide placement stays below
+            const twoVoices = await MusicXmlImporterTestHelper.loadFile(
+                'test-data/musicxml-testsuite/42a-MultiVoice-TwoVoicesOnStaff-Lyrics.xml'
+            );
+            expect(twoVoices.stylesheet.lyricsPlacement).toBe(LyricsPlacement.Below);
+            const multiStaff = await MusicXmlImporterTestHelper.loadFile(
+                'test-data/musicxml-testsuite/43f-MultiStaff-Lyrics.xml'
+            );
+            expect(multiStaff.stylesheet.lyricsPlacement).toBe(LyricsPlacement.Below);
         });
     });
 });

@@ -182,6 +182,7 @@ export class AlphaTex1LanguageDefinitions {
         ['hidedynamics', null],
         ['usesystemsignseparator', null],
         ['tuningdisplaymode', [[[[100, 107], 0, ['score', 'staff']]]]],
+        ['lyricsplacement', [[[[100, 107], 0, ['below', 'above', 'hidden']]]]],
         ['multibarrest', null],
         ['bracketextendmode', [[[[100, 107], 0, ['nobrackets', 'groupstaves', 'groupsimilarinstruments']]]]],
         ['singletracktracknamepolicy', [[[[100, 107], 0, ['hidden', 'firstsystem', 'allsystems']]]]],
@@ -540,6 +541,7 @@ export class AlphaTex1LanguageDefinitions {
         ['hidedynamics', null],
         ['usesystemsignseparator', null],
         ['tuningdisplaymode', null],
+        ['lyricsplacement', null],
         ['multibarrest', null],
         ['bracketextendmode', null],
         ['singletracktracknamepolicy', null],
@@ -582,7 +584,8 @@ export class AlphaTex1LanguageDefinitions {
                 ['restsplacement', [[[[100, 107], 0, ['allstaves', 'primary']]]]],
                 ['restssystems', [[[[100, 107], 0, ['allsystems', 'firstsystemonly']]]]],
                 ['barnumber', [[[[100, 107], 0, ['allbars', 'firstofsystem', 'hide']]]]],
-                ['rhythm', [[[[100, 107], 0, ['hidden', 'showwithbeams', 'showwithbars', 'automatic']]]]]
+                ['rhythm', [[[[100, 107], 0, ['hidden', 'showwithbeams', 'showwithbars', 'automatic']]]]],
+                ['notes', [[[[100, 107], 0, ['allnotes', 'singlenote']]]]]
             ]
         ],
         [
@@ -645,7 +648,8 @@ export class AlphaTex1LanguageDefinitions {
                 ['restsplacement', [[[[100, 107], 0, ['allstaves', 'primary']]]]],
                 ['restssystems', [[[[100, 107], 0, ['allsystems', 'firstsystemonly']]]]],
                 ['barnumber', [[[[100, 107], 0, ['allbars', 'firstofsystem', 'hide']]]]],
-                ['rhythm', [[[[100, 107], 0, ['hidden', 'showwithbeams', 'showwithbars', 'automatic']]]]]
+                ['rhythm', [[[[100, 107], 0, ['hidden', 'showwithbeams', 'showwithbars', 'automatic']]]]],
+                ['notes', [[[[100, 107], 0, ['allnotes', 'singlenote']]]]]
             ]
         ],
         ['ts', null],

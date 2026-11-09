@@ -1,4 +1,5 @@
 import type { TabRhythmMode } from '@coderline/alphatab/NotationSettings';
+import type { NumberedNoteMode } from '@coderline/alphatab/model/StaffConfigs';
 import type {
     AlphaTexAccidentalMode,
     AlphaTexStaffType,
@@ -22,6 +23,7 @@ import type { Rasgueado } from '@coderline/alphatab/model/Rasgueado';
 import type {
     BarNumberDisplay,
     BracketExtendMode,
+    LyricsPlacement,
     TrackNameMode,
     TrackNameOrientation,
     TrackNamePolicy,
@@ -220,6 +222,14 @@ export class AlphaTex1EnumMappings {
     ]);
     public static readonly tuningDisplayModeReversed = AlphaTex1EnumMappings._reverse(
         AlphaTex1EnumMappings.tuningDisplayMode
+    );
+    public static readonly lyricsPlacement = new Map<string, LyricsPlacement>([
+        ['below', 0],
+        ['above', 1],
+        ['hidden', 2]
+    ]);
+    public static readonly lyricsPlacementReversed = AlphaTex1EnumMappings._reverse(
+        AlphaTex1EnumMappings.lyricsPlacement
     );
     public static readonly textAlign = new Map<string, TextAlign>([
         ['left', 0],
@@ -456,6 +466,13 @@ export class AlphaTex1EnumMappings {
         ['automatic', 3]
     ]);
     public static readonly tabRhythmModeReversed = AlphaTex1EnumMappings._reverse(AlphaTex1EnumMappings.tabRhythmMode);
+    public static readonly numberedNoteMode = new Map<string, NumberedNoteMode>([
+        ['allnotes', 0],
+        ['singlenote', 1]
+    ]);
+    public static readonly numberedNoteModeReversed = AlphaTex1EnumMappings._reverse(
+        AlphaTex1EnumMappings.numberedNoteMode
+    );
     public static readonly keySignaturesMinorReversed = new Map<KeySignature, string>([
         [-7, 'abminor'],
         [-6, 'ebminor'],

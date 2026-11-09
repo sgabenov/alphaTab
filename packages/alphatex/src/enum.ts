@@ -21,6 +21,7 @@ export const alphaTexMappedEnumLookup = {
     TrackNameOrientation: alphaTab.model.TrackNameOrientation,
     TrackNameMode: alphaTab.model.TrackNameMode,
     TuningDisplayMode: alphaTab.model.TuningDisplayMode,
+    LyricsPlacement: alphaTab.model.LyricsPlacement,
     TextAlign: alphaTab.platform.TextAlign,
     BendType: alphaTab.model.BendType,
     KeySignature: alphaTab.model.KeySignature,
@@ -34,7 +35,8 @@ export const alphaTexMappedEnumLookup = {
     BarNumberDisplay: alphaTab.model.BarNumberDisplay,
     StaffPlacement: alphaTab.model.StaffPlacement,
     SystemDisplay: alphaTab.model.SystemDisplay,
-    TabRhythmMode: alphaTab.TabRhythmMode
+    TabRhythmMode: alphaTab.TabRhythmMode,
+    NumberedNoteMode: alphaTab.model.NumberedNoteMode
 };
 export type AlphaTexMappedEnumName = keyof typeof alphaTexMappedEnumLookup;
 
@@ -245,6 +247,11 @@ export const alphaTexMappedEnumMapping: {
     TuningDisplayMode: {
         Score: { snippet: 'score', shortDescription: 'Display tuning information above the score.' },
         Staff: { snippet: 'staff', shortDescription: 'Display tuning note names beside tab staff lines.' }
+    },
+    LyricsPlacement: {
+        Below: { snippet: 'below', shortDescription: 'Display lyrics below the standard notation staff.' },
+        Above: { snippet: 'above', shortDescription: 'Display lyrics above the standard notation staff.' },
+        Hidden: { snippet: 'hidden', shortDescription: 'Do not display lyrics.' }
     },
     TextAlign: {
         Left: {
@@ -488,6 +495,16 @@ export const alphaTexMappedEnumMapping: {
         ShowWithBeams: { snippet: 'showWithBeams', shortDescription: 'Individual beams per beat' },
         ShowWithBars: { snippet: 'showWithBars', shortDescription: 'Connected bars like standard notation' },
         Automatic: { snippet: 'automatic', shortDescription: 'Shown if no standard notation is shown' }
+    },
+    NumberedNoteMode: {
+        AllNotes: {
+            snippet: 'allNotes',
+            shortDescription: 'Every voice on its own row, chords as stacked numbers'
+        },
+        SingleNote: {
+            snippet: 'singleNote',
+            shortDescription: 'Only the first voice, one number per beat showing the highest note'
+        }
     }
 };
 

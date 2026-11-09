@@ -1,10 +1,11 @@
 import { TabRhythmMode } from '@coderline/alphatab/NotationSettings';
 import { StaffPlacement, SystemDisplay } from '@coderline/alphatab/model/ElementDisplay';
-import type {
-    NumberedStaffConfig,
-    ScoreStaffConfig,
-    SlashStaffConfig,
-    TabStaffConfig
+import {
+    NumberedNoteMode,
+    type NumberedStaffConfig,
+    type ScoreStaffConfig,
+    type SlashStaffConfig,
+    type TabStaffConfig
 } from '@coderline/alphatab/model/StaffConfigs';
 import type { Track } from '@coderline/alphatab/model/Track';
 
@@ -117,6 +118,30 @@ export enum BarNumberDisplay {
 }
 
 /**
+ * Lists the places where lyrics are displayed.
+ * @since 1.10.0
+ * @public
+ */
+export enum LyricsPlacement {
+    /**
+     * Lyrics are displayed below the standard notation staff. Without standard notation,
+     * they are displayed below the next shown staff (tablature, slash, numbered).
+     */
+    Below = 0,
+
+    /**
+     * Lyrics are displayed above the standard notation staff. Without standard notation,
+     * they are displayed above the next shown staff (tablature, slash, numbered).
+     */
+    Above = 1,
+
+    /**
+     * Lyrics are not displayed.
+     */
+    Hidden = 2
+}
+
+/**
  * This class represents the rendering stylesheet.
  * It contains settings which control the display of the score when rendered.
  * @json
@@ -149,6 +174,12 @@ export class RenderStylesheet {
      * @since 1.9.0
      */
     public tuningDisplayMode: TuningDisplayMode = TuningDisplayMode.Score;
+
+    /**
+     * The place where lyrics are displayed.
+     * @since 1.10.0
+     */
+    public lyricsPlacement: LyricsPlacement = LyricsPlacement.Below;
 
     /**
      * Whether to show the tuning.(per-track)
@@ -291,6 +322,7 @@ export class RenderStylesheet {
      */
     public numberedConfig: NumberedStaffConfig = {
         timeSignature: { isVisible: true, staffPlacement: StaffPlacement.Primary, systemDisplay: SystemDisplay.AllSystems },
-        barNumber: BarNumberDisplay.FirstOfSystem
+        barNumber: BarNumberDisplay.FirstOfSystem,
+        notes: NumberedNoteMode.AllNotes
     };
 }
