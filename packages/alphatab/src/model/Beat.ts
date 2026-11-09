@@ -531,6 +531,14 @@ export class Beat {
     public graceType: GraceType = GraceType.None;
 
     /**
+     * The optional Guitar Pro rhythm value for this grace beat. Preserved for
+     * GP import/export independently of the duration used by alphaTab layout
+     * and playback. Null uses alphaTab's normal grace duration.
+     * @since 1.10.0
+     */
+    public gpGraceDuration: Duration | null = null;
+
+    /**
      * Gets or sets the grace group this beat belongs to.
      * If this beat is not a grace note, it holds the group which belongs to this beat.
      * @json_ignore

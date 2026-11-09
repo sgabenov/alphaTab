@@ -39,7 +39,7 @@ import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
  * @internal
  */
 export class BeatSerializer {
-    private static readonly _fields: RecordFields = new RecordFields(["id", "notes", "isempty", "whammystyle", "ottava", "islegatoorigin", "duration", "automations", "dots", "fadein", "fade", "lyrics", "pop", "slap", "tap", "text", "slashed", "deadslapped", "restdisplaytone", "restdisplayoctave", "brushtype", "brushduration", "tupletdenominator", "tupletnumerator", "iscontinuedwhammy", "whammybartype", "whammybarpoints", "vibrato", "chordid", "gracetype", "pickstroke", "tremolopicking", "tremolospeed", "crescendo", "displaystart", "playbackstart", "displayduration", "playbackduration", "overridedisplayduration", "golpe", "dynamics", "showdynamics", "invertbeamdirection", "preferredbeamdirection", "beamingmode", "wahpedal", "barrefret", "barreshape", "rasgueado", "showtimer", "timer", "style"]);
+    private static readonly _fields: RecordFields = new RecordFields(["id", "notes", "isempty", "whammystyle", "ottava", "islegatoorigin", "duration", "automations", "dots", "fadein", "fade", "lyrics", "pop", "slap", "tap", "text", "slashed", "deadslapped", "restdisplaytone", "restdisplayoctave", "brushtype", "brushduration", "tupletdenominator", "tupletnumerator", "iscontinuedwhammy", "whammybartype", "whammybarpoints", "vibrato", "chordid", "gracetype", "gpgraceduration", "pickstroke", "tremolopicking", "tremolospeed", "crescendo", "displaystart", "playbackstart", "displayduration", "playbackduration", "overridedisplayduration", "golpe", "dynamics", "showdynamics", "invertbeamdirection", "preferredbeamdirection", "beamingmode", "wahpedal", "barrefret", "barreshape", "rasgueado", "showtimer", "timer", "style"]);
     public static read(obj: Beat, reader: IObjectReader): void {
         reader.readRecord(BeatSerializer._fields, (id, k, r) => {
             switch (id) {
@@ -134,9 +134,12 @@ export class BeatSerializer {
                     obj.graceType = JsonHelper.parseEnum<GraceType>(r.readValue(), GraceType)!;
                     return true;
                 case 30:
-                    obj.pickStroke = JsonHelper.parseEnum<PickStroke>(r.readValue(), PickStroke)!;
+                    obj.gpGraceDuration = JsonHelper.parseEnum<Duration>(r.readValue(), Duration) ?? null;
                     return true;
                 case 31:
+                    obj.pickStroke = JsonHelper.parseEnum<PickStroke>(r.readValue(), PickStroke)!;
+                    return true;
+                case 32:
                     if (r.isNullish()) {
                         obj.tremoloPicking = undefined;
                     }
@@ -145,64 +148,64 @@ export class BeatSerializer {
                         TremoloPickingEffectSerializer.read(obj.tremoloPicking, r);
                     }
                     return true;
-                case 32:
+                case 33:
                     obj.tremoloSpeed = JsonHelper.parseEnum<Duration>(r.readValue(), Duration) ?? null;
                     return true;
-                case 33:
+                case 34:
                     obj.crescendo = JsonHelper.parseEnum<CrescendoType>(r.readValue(), CrescendoType)!;
                     return true;
-                case 34:
+                case 35:
                     obj.displayStart = r.readNumber();
                     return true;
-                case 35:
+                case 36:
                     obj.playbackStart = r.readNumber();
                     return true;
-                case 36:
+                case 37:
                     obj.displayDuration = r.readNumber();
                     return true;
-                case 37:
+                case 38:
                     obj.playbackDuration = r.readNumber();
                     return true;
-                case 38:
+                case 39:
                     obj.overrideDisplayDuration = r.readValue() as number | undefined;
                     return true;
-                case 39:
+                case 40:
                     obj.golpe = JsonHelper.parseEnum<GolpeType>(r.readValue(), GolpeType)!;
                     return true;
-                case 40:
+                case 41:
                     obj.dynamics = JsonHelper.parseEnum<DynamicValue>(r.readValue(), DynamicValue)!;
                     return true;
-                case 41:
+                case 42:
                     obj.showDynamics = r.readValue() as boolean | undefined;
                     return true;
-                case 42:
+                case 43:
                     obj.invertBeamDirection = r.readBoolean();
                     return true;
-                case 43:
+                case 44:
                     obj.preferredBeamDirection = JsonHelper.parseEnum<BeamDirection>(r.readValue(), BeamDirection) ?? null;
                     return true;
-                case 44:
+                case 45:
                     obj.beamingMode = JsonHelper.parseEnum<BeatBeamingMode>(r.readValue(), BeatBeamingMode)!;
                     return true;
-                case 45:
+                case 46:
                     obj.wahPedal = JsonHelper.parseEnum<WahPedal>(r.readValue(), WahPedal)!;
                     return true;
-                case 46:
+                case 47:
                     obj.barreFret = r.readNumber();
                     return true;
-                case 47:
+                case 48:
                     obj.barreShape = JsonHelper.parseEnum<BarreShape>(r.readValue(), BarreShape)!;
                     return true;
-                case 48:
+                case 49:
                     obj.rasgueado = JsonHelper.parseEnum<Rasgueado>(r.readValue(), Rasgueado)!;
                     return true;
-                case 49:
+                case 50:
                     obj.showTimer = r.readBoolean();
                     return true;
-                case 50:
+                case 51:
                     obj.timer = r.readValue() as number | null;
                     return true;
-                case 51:
+                case 52:
                     if (r.isNullish()) {
                         obj.style = undefined;
                     }
@@ -294,31 +297,32 @@ export class BeatSerializer {
         w.numberField(27, obj.vibrato as number);
         w.valueField(28, obj.chordId);
         w.numberField(29, obj.graceType as number);
-        w.numberField(30, obj.pickStroke as number);
+        w.valueField(30, obj.gpGraceDuration as number | null);
+        w.numberField(31, obj.pickStroke as number);
         if (obj.tremoloPicking) {
-            w.field(31);
+            w.field(32);
             TremoloPickingEffectSerializer.write(obj.tremoloPicking, w);
         }
-        w.numberField(33, obj.crescendo as number);
-        w.numberField(34, obj.displayStart);
-        w.numberField(35, obj.playbackStart);
-        w.numberField(36, obj.displayDuration);
-        w.numberField(37, obj.playbackDuration);
-        w.valueField(38, obj.overrideDisplayDuration);
-        w.numberField(39, obj.golpe as number);
-        w.numberField(40, obj.dynamics as number);
-        w.valueField(41, obj.showDynamics);
-        w.booleanField(42, obj.invertBeamDirection);
-        w.valueField(43, obj.preferredBeamDirection as number | null);
-        w.numberField(44, obj.beamingMode as number);
-        w.numberField(45, obj.wahPedal as number);
-        w.numberField(46, obj.barreFret);
-        w.numberField(47, obj.barreShape as number);
-        w.numberField(48, obj.rasgueado as number);
-        w.booleanField(49, obj.showTimer);
-        w.valueField(50, obj.timer);
+        w.numberField(34, obj.crescendo as number);
+        w.numberField(35, obj.displayStart);
+        w.numberField(36, obj.playbackStart);
+        w.numberField(37, obj.displayDuration);
+        w.numberField(38, obj.playbackDuration);
+        w.valueField(39, obj.overrideDisplayDuration);
+        w.numberField(40, obj.golpe as number);
+        w.numberField(41, obj.dynamics as number);
+        w.valueField(42, obj.showDynamics);
+        w.booleanField(43, obj.invertBeamDirection);
+        w.valueField(44, obj.preferredBeamDirection as number | null);
+        w.numberField(45, obj.beamingMode as number);
+        w.numberField(46, obj.wahPedal as number);
+        w.numberField(47, obj.barreFret);
+        w.numberField(48, obj.barreShape as number);
+        w.numberField(49, obj.rasgueado as number);
+        w.booleanField(50, obj.showTimer);
+        w.valueField(51, obj.timer);
         if (obj.style) {
-            w.field(51);
+            w.field(52);
             BeatStyleSerializer.write(obj.style, w);
         }
         w.endObject();

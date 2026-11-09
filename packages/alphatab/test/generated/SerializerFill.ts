@@ -800,6 +800,7 @@ export class SerializerFill {
         obj.vibrato = SerializerFill.otherEnumValue(VibratoType, obj.vibrato) as VibratoType;
         obj.chordId = 'x ä€𝄞';
         obj.graceType = SerializerFill.otherEnumValue(GraceType, obj.graceType) as GraceType;
+        obj.gpGraceDuration = SerializerFill.otherEnumValue(Duration, obj.gpGraceDuration) as Duration;
         obj.pickStroke = SerializerFill.otherEnumValue(PickStroke, obj.pickStroke) as PickStroke;
         {
             const v0 = new TremoloPickingEffect();

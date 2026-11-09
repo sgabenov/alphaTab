@@ -826,7 +826,10 @@ export class GpifWriter {
     }
 
     private _writeRhythm(parent: XmlNode, beat: Beat, rhythms: XmlNode) {
-        const rhythmId = `${beat.duration}_${beat.dots}_${beat.tupletNumerator}_${beat.tupletDenominator}';`;
+        const duration = beat.graceType === GraceType.BeforeBeat || beat.graceType === GraceType.OnBeat
+            ? beat.gpGraceDuration ?? beat.duration
+            : beat.duration;
+        const rhythmId = `${duration}_${beat.dots}_${beat.tupletNumerator}_${beat.tupletDenominator}';`;
 
         let rhythm: string;
         if (!this._rhythmIdLookup.has(rhythmId)) {
@@ -846,7 +849,7 @@ export class GpifWriter {
             }
 
             let noteValue = 'Quarter';
-            switch (beat.duration) {
+            switch (duration) {
                 case Duration.QuadrupleWhole:
                     noteValue = 'Long';
                     break;

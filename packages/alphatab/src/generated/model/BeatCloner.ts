@@ -56,6 +56,7 @@ export class BeatCloner {
         clone.vibrato = original.vibrato;
         clone.chordId = original.chordId;
         clone.graceType = original.graceType;
+        clone.gpGraceDuration = original.gpGraceDuration;
         clone.pickStroke = original.pickStroke;
         clone.tremoloPicking = original.tremoloPicking ? TremoloPickingEffectCloner.clone(original.tremoloPicking) : undefined;
         clone.crescendo = original.crescendo;

@@ -2736,6 +2736,9 @@ export class GpifParser {
         const rhythmId: string = this._rhythmOfBeat.get(beatId)!;
         const rhythm: GpifRhythm = this._rhythmById.get(rhythmId)!;
         beat.duration = rhythm.value;
+        if ((beat.graceType === GraceType.BeforeBeat || beat.graceType === GraceType.OnBeat) && rhythm.value !== Duration.Eighth) {
+            beat.gpGraceDuration = rhythm.value;
+        }
         beat.dots = rhythm.dots;
         beat.tupletNumerator = rhythm.tupletNumerator;
         beat.tupletDenominator = rhythm.tupletDenominator;

@@ -12,6 +12,10 @@ import { IOHelper } from '@coderline/alphatab/io/IOHelper';
 import { TechniqueSymbolPlacement } from '@coderline/alphatab/model/InstrumentArticulation';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import { BackingTrack } from '@coderline/alphatab/model/BackingTrack';
+import { Beat } from '@coderline/alphatab/model/Beat';
+import { Duration } from '@coderline/alphatab/model/Duration';
+import { GraceType } from '@coderline/alphatab/model/GraceType';
+import { Note } from '@coderline/alphatab/model/Note';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Score } from '@coderline/alphatab/model/Score';
 import { Settings } from '@coderline/alphatab/Settings';
@@ -767,6 +771,28 @@ describe('Gp7ExporterTest', () => {
         xml.parse(IOHelper.toString(gpifData, ''));
         return readFullInstrumentSet(xml);
     }
+
+    it('preserves Guitar Pro grace durations through repeated export and import', () => {
+        for (const duration of [Duration.ThirtySecond, Duration.SixtyFourth]) {
+            const score = ScoreLoader.loadAlphaTex('3.3.4 5.3.4');
+            const voice = score.tracks[0].staves[0].bars[0].voices[0];
+            const grace = new Beat();
+            grace.graceType = GraceType.BeforeBeat;
+            const note = new Note();
+            note.string = 3;
+            note.fret = 4;
+            grace.addNote(note);
+            voice.insertBeat(voice.beats[0], grace);
+            score.finish(new Settings());
+            grace.gpGraceDuration = duration;
+
+            const imported = prepareImporterWithBytes(exportGp7(score)).readScore();
+            const roundTripped = prepareImporterWithBytes(exportGp7(imported)).readScore();
+            const result = roundTripped.tracks[0].staves[0].bars[0].voices[0].beats.find(b => b.graceType === GraceType.BeforeBeat)!;
+            expect(result.gpGraceDuration).toBe(duration);
+            expect(result.duration).toBe(Duration.Eighth);
+        }
+    });
 
     it('preserves per-note Guitar Pro velocity fields through export and import', () => {
         const score = ScoreLoader.loadAlphaTex('\\track { instrument percussion } \\clef neutral \\articulation defaults \"Kick (hit) 2\".4');
