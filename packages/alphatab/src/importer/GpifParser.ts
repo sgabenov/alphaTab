@@ -2268,6 +2268,9 @@ export class GpifParser {
                 case 'RelativeVelocity':
                     note.gpRelativeVelocity = GpifParser._parseFloatSafe(c.innerText, 0);
                     break;
+                case 'Offset':
+                    note.gpNoteOffset = GpifParser._parseIntSafe(c.innerText, 0);
+                    break;
                 case 'AntiAccent':
                     if (c.innerText.toLowerCase() === 'normal') {
                         note.isGhost = true;

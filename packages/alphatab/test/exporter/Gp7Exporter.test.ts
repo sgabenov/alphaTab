@@ -805,6 +805,19 @@ describe('Gp7ExporterTest', () => {
         expect(result.gpRelativeVelocity).toBe(2);
     });
 
+    it('preserves per-note Guitar Pro offsets through repeated GP export and import', () => {
+        for (const offset of [-15, 0, 15]) {
+            const score = ScoreLoader.loadAlphaTex('3.3.4 5.3.4');
+            const notes = score.tracks[0].staves[0].bars[0].voices[0].beats.map(b => b.notes[0]);
+            notes[0].gpNoteOffset = offset;
+            const imported = prepareImporterWithBytes(exportGp7(score)).readScore();
+            const roundTripped = prepareImporterWithBytes(exportGp7(imported)).readScore();
+            const result = roundTripped.tracks[0].staves[0].bars[0].voices[0].beats;
+            expect(result[0].notes[0].gpNoteOffset).toBe(offset);
+            expect(result[1].notes[0].gpNoteOffset).toBeNull();
+        }
+    });
+
     it('preserves fractional relative velocity through repeated GP export and import', () => {
         for (const relative of [2.75, -1.5]) {
             const score = ScoreLoader.loadAlphaTex('\\\\track { instrument percussion } \\\\clef neutral \\\\articulation defaults "Kick (hit) 2".4');

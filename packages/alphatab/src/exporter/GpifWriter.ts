@@ -218,6 +218,9 @@ export class GpifWriter {
         if (gpRelativeVelocity !== null) {
             noteNode.addElement('RelativeVelocity').innerText = gpRelativeVelocity.toString();
         }
+        if (note.gpNoteOffset !== null) {
+            noteNode.addElement('Offset').innerText = note.gpNoteOffset.toString();
+        }
 
         if (note.isGhost) {
             noteNode.addElement('AntiAccent').innerText = 'normal';

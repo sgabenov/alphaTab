@@ -28,7 +28,7 @@ import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
  * @internal
  */
 export class NoteSerializer {
-    private static readonly _fields: RecordFields = new RecordFields(["id", "accentuated", "bendtype", "bendstyle", "iscontinuedbend", "bendpoints", "fret", "string", "showstringnumber", "octave", "tone", "percussionarticulation", "isvisible", "islefthandtapped", "ishammerpullorigin", "isslurdestination", "harmonictype", "harmonicvalue", "isghost", "isletring", "ispalmmute", "isdead", "isstaccato", "slideintype", "slideouttype", "vibrato", "istiedestination", "lefthandfinger", "righthandfinger", "trillvalue", "trillspeed", "istrillstart", "durationpercent", "accidentalmode", "dynamics", "gpvelocity", "gprelativevelocity", "ornament", "style"]);
+    private static readonly _fields: RecordFields = new RecordFields(["id", "accentuated", "bendtype", "bendstyle", "iscontinuedbend", "bendpoints", "fret", "string", "showstringnumber", "octave", "tone", "percussionarticulation", "isvisible", "islefthandtapped", "ishammerpullorigin", "isslurdestination", "harmonictype", "harmonicvalue", "isghost", "isletring", "ispalmmute", "isdead", "isstaccato", "slideintype", "slideouttype", "vibrato", "istiedestination", "lefthandfinger", "righthandfinger", "trillvalue", "trillspeed", "istrillstart", "durationpercent", "accidentalmode", "dynamics", "gpvelocity", "gprelativevelocity", "ornament", "style", "gpnoteoffset"]);
     public static read(obj: Note, reader: IObjectReader): void {
         reader.readRecord(NoteSerializer._fields, (id, k, r) => {
             switch (id) {
@@ -155,6 +155,9 @@ export class NoteSerializer {
                         NoteStyleSerializer.read(obj.style, r);
                     }
                     return true;
+                case 39:
+                    obj.gpNoteOffset = r.readValue() as number | null;
+                    return true;
             }
             return id < 0 ? obj.setProperty(k, r) : false;
         });
@@ -234,6 +237,7 @@ export class NoteSerializer {
             w.field(38);
             NoteStyleSerializer.write(obj.style, w);
         }
+        w.valueField(39, obj.gpNoteOffset);
         obj.toJson(w);
         w.endObject();
     }
