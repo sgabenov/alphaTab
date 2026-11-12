@@ -2282,6 +2282,9 @@ export class GpifParser {
                 case 'Offset':
                     note.gpNoteOffset = GpifParser._parseIntSafe(c.innerText, 0);
                     break;
+                case 'Duration':
+                    note.gpNoteDuration = GpifParser._parseFloatSafe(c.innerText, 1);
+                    break;
                 case 'AntiAccent':
                     if (c.innerText.toLowerCase() === 'normal') {
                         note.isGhost = true;

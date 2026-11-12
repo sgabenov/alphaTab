@@ -55,6 +55,7 @@ export class NoteCloner {
         clone.gpRelativeVelocity = original.gpRelativeVelocity;
         clone.ornament = original.ornament;
         clone.gpNoteOffset = original.gpNoteOffset;
+        clone.gpNoteDuration = original.gpNoteDuration;
         return clone;
     }
 }

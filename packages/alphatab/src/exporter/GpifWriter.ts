@@ -222,6 +222,9 @@ export class GpifWriter {
         if (note.gpNoteOffset !== null) {
             noteNode.addElement('Offset').innerText = note.gpNoteOffset.toString();
         }
+        if (note.gpNoteDuration !== null) {
+            noteNode.addElement('Duration').innerText = note.gpNoteDuration.toString();
+        }
 
         if (note.isGhost) {
             noteNode.addElement('AntiAccent').innerText = 'normal';

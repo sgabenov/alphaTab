@@ -1002,13 +1002,14 @@ export class SerializerFill {
         obj.dynamics = SerializerFill.otherEnumValue(DynamicValue, obj.dynamics) as DynamicValue;
         obj.gpVelocity = 7.25;
         obj.gpRelativeVelocity = 7.25;
-        obj.gpNoteOffset = 15;
         obj.ornament = SerializerFill.otherEnumValue(NoteOrnament, obj.ornament) as NoteOrnament;
         {
             const v0 = new NoteStyle();
             SerializerFill.fillNoteStyle(v0, depth + 1);
             obj.style = v0;
         }
+        obj.gpNoteOffset = 7.25;
+        obj.gpNoteDuration = 7.25;
     }
     public static fillPlaybackInformation(obj: PlaybackInformation, depth: number = 0): void {
         if (depth > 8) {

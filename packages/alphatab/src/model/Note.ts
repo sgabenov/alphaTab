@@ -672,6 +672,13 @@ export class Note {
      */
     public gpNoteOffset: number | null = null;
 
+    /**
+     * Guitar Pro's optional per-note playback duration as a ratio of the written note value.
+     * Preserved on GP import and export; not currently applied to alphaTab playback.
+     * @since 1.10.0
+     */
+    public gpNoteDuration: number | null = null;
+
     public get stringTuning(): number {
         return this.beat.voice.bar.staff.capo + Note.getStringTuning(this.beat.voice.bar.staff, this.string);
     }
